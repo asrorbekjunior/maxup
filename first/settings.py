@@ -5,7 +5,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = "4sqj5vZRKK-0DRKRj3q7sPEH9t-a2SXh4cPhUQXlu3-lqrj-07MNOmEd_onXj0BFUaQ"
 DEBUG = False
 
-ALLOWED_HOSTS = ["maxuppppp-production.up.railway.app", "127.0.0.1", "maxup.uz", "localhost"]
+ALLOWED_HOSTS = ["maxuppppp-production.up.railway.app", "127.0.0.1", "maxup.uz", "localhost", "185.191.141.79"]
 
 
 INSTALLED_APPS = [
