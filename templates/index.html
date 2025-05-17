@@ -1,0 +1,735 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAX UP</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <style>
+        /* Kommentariya bloki */
+        .comment-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+        }
+
+        .comment-content {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .comment-author {
+            font-weight: bold;
+        }
+
+        .comment-text {
+            margin-top: 5px;
+        }
+
+        /* Forma konteyneri */
+        .form-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container input,
+        .form-container select,
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-container button {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .form-container button:hover {
+            background: #0056b3;
+        }
+
+        /* Mobil moslashuv */
+        @media (max-width: 480px) {
+            .form-container {
+                max-width: 90%;
+                padding: 15px;
+            }
+
+            .form-container input,
+            .form-container select,
+            .form-container button {
+                font-size: 14px;
+            }
+        }
+
+        #timer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .timer-box {
+            width: 60px;
+            height: 60px;
+            background: #ff4d4d;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            margin: 0 5px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .timer-colon {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+
+        .chest_container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: nowrap;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .chest_box {
+            position: relative;
+            text-align: center;
+            max-width: 150px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .chest_container {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                /* Kichik ekranlarda skroll qilish mumkin bo'ladi */
+            }
+
+        }
+
+
+        .chest_image {
+            width: 100%;
+            height: auto;
+        }
+
+        .chest_text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: black;
+            background: white;
+            opacity: 0.7;
+            padding: 20px 30px;
+            border-radius: 5px;
+
+            /* Chaqmoq shakli */
+            clip-path: polygon(50% 0%, 61% 15%, 70% 0%, 79% 10%, 89% 0%, 91% 20%, 80% 30%,
+                    85% 50%, 75% 50%, 70% 70%, 60% 60%, 50% 100%, 40% 70%,
+                    30% 60%, 20% 50%, 10% 40%, 20% 30%, 30% 10%, 40% 20%);
+        }
+
+
+
+
+
+        /* Katta ekranlar uchun tuzatish */
+        @media (min-width: 768px) {
+            .chest_box {
+                max-width: 180px;
+                /* Katta ekranda biroz kattaroq */
+            }
+
+            .chest_text {
+                font-size: 28px;
+                /* Katta ekranda kattaroq foiz matni */
+            }
+        }
+
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal_content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 300px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .modal h2 {
+            color: #28a745;
+        }
+
+        .modal button {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Modal chiqish animatsiyasi */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes tadaa {
+            0% {
+                transform: scale(1);
+            }
+
+            10%,
+            20% {
+                transform: scale(1.1) rotate(3deg);
+            }
+
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: scale(1.1) rotate(-3deg);
+            }
+
+            40%,
+            60%,
+            80% {
+                transform: scale(1.1) rotate(3deg);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .box {
+            display: inline-block;
+            padding: 20px 40px;
+            font-size: 24px;
+            background-color: #ffcc00;
+            color: #333;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .box.tadaa {
+            animation: tadaa 0.6s ease-in-out;
+        }
+    </style>
+
+    <style>
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #ff5733;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: fall 3s ease-in forwards;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+
+        footer .footer-text {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="ribbon-container"></div>
+
+    <div class="container">
+        <img src="{% static 'images/image0.png' %}" alt="Qo‘shimcha rasm" class="product-image">
+        <h4 style="text-align: center;"> <span style="color: red; font-weight: bold;">Диққат: </span> Агар Сиз ушбу
+            касалликлардан халос бўлишни истасангиз, ҳозир биз қуйида бериб ўтадиган маслаҳатларни охиригача ўқинг.
+            Вақтида қаратилган этибор келажак учун пойдевор бўлади. Охирида раҳмат айтасиз!</h4>
+
+        <p>
+        <h5>Мухбир:</h5>
+        </p>
+        <p>Бўлиб ўтган халқаро анжуманда иштирокы билан, барчага ўрнак бўла олган Тиббиёт фанлари академияси академиги,
+            соғлиқни сақлаш алочиси, 3 та тиббиётны бирлаштирган мутахассис олим инсон Алижон Факиров Зоҳидович урология
+            бўйича бутун бор аччиқ ҳақиқатларни айтиб бердилар.</p>
+
+        <img src="{% static 'images/image1.png' %}" alt="Qo‘shimcha rasm" class="product-image">
+
+        <div style="display: flex; align-items: end;">
+            <span>
+                <h5 style="padding: 0; margin: 0px;">Алижон Зохидий</h5>
+            </span>
+            <span onclick="redirectToForm()">
+                <img src="{% static 'images/galochka.png' %}" alt="Qo‘shimcha rasm"
+                    style="width: 21px; height: 21px; margin: auto 0;">
+            </span>
+        </div>
+
+        <p>
+            Жинсий ҳаёт инсон умрининг энг ширин лаззатларидан бири ҳисобланади. Еркак киши 18 ёшда
+            ҳам,
+            70-80 ёшда ҳам
+            еркак бўлиб қолаверади. Ёш ўтган сари конгил йошаради, шунинг учун еркак киши жинсий алоқада доимо мустаҳкам
+            бўлиши лозим.</p>
+
+        <h3 style="text-align: center;"><span style="color: red; font-weight: bold;">Аёлнинг хиёнати еркакни
+                ўлдиради</span></h3>
+        <p>Купчилик биламиз, ҳозирги кунда ёри бўла туриб бошқаси билан юрганларга гувоҳмиз. Бунга арзигулик сабаблар
+            етарли. Аёл кишини еркак кишига караганда ҳирси 10 баробар кучлироқ. У сиздан камида 20-30 дақиқалик давомий
+            жинсий алоқани хоҳлайди. Агарда сиз 5 дақиқага бормасдан бошалиб коядиган болсангиз, аёл киши ўзининг
+            истаган лаззати ва рохатини ололмайди. Бу кескин тарзда узоқ муддат давом этса, аёл киши кучага оёқлаши
+            мумкин. Еркаклар эътиборли бўлишимиз керак, чунки оила бу муқаддасдир. Уни бир меъёрда ушлаш еркак кулида.
+        </p>
+
+        <p>&nbsp;</p>
+
+        <div style="display: flex; align-items: end;">
+            <span>
+                <h5 style="padding: 0; margin: 0px;">Алижон Зохидий</h5>
+            </span>
+            <span onclick="redirectToForm()">
+                <img src="{% static 'images/galochka.png' %}" alt="Qo‘shimcha rasm"
+                    style="width: 21px; height: 21px; margin: auto 0;">
+            </span>
+        </div>
+
+        <h3 style="text-align: center;"><span style="color: red; font-weight: bold;">Илмий Фактлар</span></h3>
+
+        <h3>Жинсий ожизликка олиб борувчи аниқ сабаблар:</h3>
+        <p>1. Аргазм учун танланган воҳитнинг нотўғрилиги.</p>
+        <p>2. Узоқ муддат алоқадан тўхтаб қолиш.</p>
+        <p>3. Простата бези шамоллаб, сперма суюқлигининг миқдори камайиб кетиши.</p>
+        <p>4. Спиртли ичимликлар ва турли хил тамаки маҳсулотлари.</p>
+        <p>5. Ҳар хил руҳий синишлар ва стресслар. </p>
+        <p>6. Моддалар алмашинуви бузилиши туфайли келиб чиқувчи сахир касаллиги.</p>
+        <p>7. Узоқ вақт бир жойда ҳаракатсиз меҳнат фаолиятини юритиш кон айланиш серкуляциясини бузади, олатга қон яхши
+            етиб бормайди.</p>
+        <p>8. Турли туман сиҳдик йўли инфекциялари.</p>
+        <p>&nbsp;</p>
+
+        <div style="display: flex; align-items: end;">
+            <span>
+                <h5 style="padding: 0; margin: 0px;">Алижон Зохидий</h5>
+            </span>
+            <span onclick="redirectToForm()">
+                <img src="{% static 'images/galochka.png' %}" alt="Qo‘shimcha rasm"
+                    style="width: 21px; height: 21px; margin: auto 0;">
+            </span>
+        </div>
+        <h3 style="text-align: center;"><span style="color: red; font-weight: bold;">Тажрибалар</span></h3>
+        <p>Уйланганига 1 йил тўлмай рафиқасини ҳомиладор бўлмагани учун айбдор дейдиган йигитлар ҳам топилади.
+            Етмаганига тушкунликда юрган келинни сиқувга олишади. Бундай қилиб, севикли ёрингизни боши берк кочага
+            ташлаб койгандан кўра, робаро келган муамо билан биргаликда курашиш яхши емасми? Купол ва терс гаплар билан
+            аёлнинг дилини сиёҳ қилиш қанчалик тўғри иш? Келин ҳам бировнинг боласи эканлигини ҳеч қачон унутманг.</p>
+        <p>&nbsp;</p>
+        <img src="{% static 'images/image2.png' %}" alt="Qo‘shimcha rasm" class="product-image">
+        <p>&nbsp;</p>
+        <p>Айб фақат аёлда ёки еркакда эмас. Тиббиётда ўтказилган сўнгги илмий тадқиқотлар бу каби ҳолатнинг тахминан
+            тенг ярмида еркаклар ҳам сабабчи бўлишини кўрсатмоқда. Аммо муаммолар вақтини аниқлашмай, бахоналарга пеш
+            килинади. Ҳурматли ота-оналар, турли хил муҳокамалардан фойда йўқ. Муаммога фақат ечим изламок даркор.</p>
+        <p>&nbsp;</p>
+        <h3 style="text-align: center;"><span style="color: red; font-weight: bold;">Қуёв бола</span>, ўзингиздан зуриёт
+            қолдиришни истайсиз? Тўғрими?</h3>
+        <img src="{% static 'images/image3.png' %}" alt="Qo‘shimcha rasm" class="product-image">
+
+        <p>Атрофдагиларнинг аччиқ-чучиқ гапларига қулоқ солмай, оилангиз бутунлиги ҳақида ўйланг. Бу ишни яқинларингиз
+            ва ошна-оғайнингизни танласангиз ҳам еплайсиз.</p>
+        <p>&nbsp;</p>
+
+        <div style="display: flex; align-items: end;">
+            <span>
+                <h5 style="padding: 0; margin: 0px;">Алижон Зохидий</h5>
+            </span>
+            <span onclick="redirectToForm()">
+                <img src="{% static 'images/galochka.png' %}" alt="Qo‘shimcha rasm"
+                    style="width: 21px; height: 21px; margin: auto 0;">
+            </span>
+        </div>
+        <h3 style="text-align: center;"><span style="color: red; font-weight: bold;">Хулосалар</span></h3>
+        <p>Мен 40 йиллик фаолиятим давомида жуда кўп беморлар билан мулоқотда бўлдим, турли операциялар ўтказдим ва
+            беморларнинг шикоятлари билан ўртоқлашдим. Уларнинг момолари шу кадар жиддй едики борган сари вазият
+            етборимнт торта бошлади негаки уларни оиласида болайотган дил хираликлар, яъни фарзандсизлик ва жинсий
+            ожизлик туфайли тушкунликка ғарқ болиб кетайотган еркак-айоларимиз сони охирги йилларда жуда кўпайиб
+            кетди.арзимас сабабларга кора Оддий ҳолатга айланиб бораётган ажримлар сони ортди.</p>
+
+        <p>Биз бу ҳолатга индамай, жимгина куз юмиб тура олмадик. Бу маш-машалар долзарб момолар ҳал болиши учун
+            ҳамкасбларимиз билан бирга ертаю кеч чукур музокаралар олиб бордик. Натижада 100% синовлардан ўтган
+            тажрибаларда халқимиз манфаати учун ишлатлган табиий max up воситасини юзага чиқаришга муваффақ бўлдик.Ва бу
+            беморларга фойда бераётганига барчамиз анжуманда гувоҳ бўлдингиз.</p>
+
+        <p>ойлайманки шунча йиллик мехнатмиз уз самарасини курсатаетган екан ажратган вохтимиз бехуда кетмагани учун
+            боғоятда хурсандмиз </p>
+
+        <p>Мах уп препарати узи нима учун ичилади ва кайси касалликларга карши курашиши хакида кискача</p>
+        <p>1 Простата бези яллигланиши да ишишликни кайтаради</p>
+        <p>2 Тез тез хожатга боришни юкотади </p>
+        <p>3 Пепуштликда уруглар фойизини оширишда кумак беради</p>
+        <p>4 Имун тизимини баркарорлаштириб жинсий кувватни мустахкам булишини таминлайди</p>
+        <p>5 Еркакни узига булган ишончини орттириб тушакда кахрамон килади</p>
+
+        <p>&nbsp;</p>
+
+        <div style="display: flex; align-items: end;">
+            <span>
+                <h5 style="padding: 0; margin: 0px;">Алижон Зохидий</h5>
+            </span>
+            <span onclick="redirectToForm()">
+                <img src="{% static 'images/galochka.png' %}" alt="Qo‘shimcha rasm"
+                    style="width: 21px; height: 21px; margin: auto 0;">
+            </span>
+        </div>
+
+        <h3 style="text-align: center;"><span style="color: red; font-weight: bold;">Тавсиялар:</span></h3>
+        <p>Аввал мутахассис маслаҳатини олинг.</p>
+        <p>Сўнг даво чораларини қўлланг.</p>
+        <p>Мутахассислар билан бўлган мулоқотингиз сир сақланишини 100% кафолатлайман. Аллоҳ барчангизга шифо берсин!
+        </p>
+        <p>Кейинги харидингиз бешик бўлсин 😊</p>
+    </div>
+    <p>&nbsp;</p>
+
+    <div style="width: 100%;" id="chest-div" class="box" onclick="tadaaEffect(this)">
+        <h1 style="text-align: center;">Сизнингча кайси сандик ортида имтиёзли чегирма мавжуд танланг</h1>
+
+        <div style="margin-top: 20px;" class="chest_container" id="chest_container">
+            <div class="chest_box" onclick="toggleChest(this)">
+                <img src="{% static 'images/chest_close.png' %}" alt="Profil rasmi" class="chest_image">
+                <div class="chest_text" hidden></div>
+            </div>
+            <div class="chest_box" onclick="toggleChest(this)">
+                <img src="{% static 'images/chest_close.png' %}" alt="Profil rasmi" class="chest_image">
+                <div class="chest_text" hidden></div>
+            </div>
+            <div class="chest_box" onclick="toggleChest(this)">
+                <img src="{% static 'images/chest_close.png' %}" alt="Profil rasmi" class="chest_image">
+                <div class="chest_text" hidden></div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Modal Oynasi -->
+    <div id="discountModal" class="modal">
+        <div class="modal_content">
+            <p>
+                🎉 Табриклаймиз сиз 70 % Скиткада Мах уп препаратини 22000 минг сум евазига ютиб олдингиз
+            </p>
+            <button onclick="redirectToDiscount()">Olish</button>
+        </div>
+    </div>
+
+    <!-- Sahifada yonaltirish uchun joy -->
+    <div style="padding: 50px; background: #f4f4f4;">
+        <h2>Чегирма вакти тугаябди бошка чегирма берилмайди</h2>
+
+        <img id="discountSection" src="{% static 'images/image4.png' %}" alt="Qo‘shimcha rasm" class="product-image">
+
+        <p>&nbsp;</p>
+        <div id="timer-container">
+            <div class="timer-box" id="hours">00</div>
+            <div class="timer-colon">:</div>
+            <div class="timer-box" id="minutes">00</div>
+            <div class="timer-colon">:</div>
+            <div class="timer-box" id="seconds">00</div>
+        </div>
+        <p>&nbsp;</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Yuborish</button>
+        </form>
+    </div>
+
+    <div class="container mt-5">
+        <h3>So'ngi sharhlar</h3>
+
+        {% for comment in comments %}
+        <div class="comment-box">
+            <img style="object-fit: cover;" src="{{ comment.avatar_url }}" alt="Profil rasmi" class="avatar">
+            <div class="comment-content">
+                <div class="comment-author" onclick="redirectToForm()">{{ comment.author }}</div>
+                <div class="comment-text" onclick="redirectToForm()">{{ comment.text }}</div>
+
+                <!-- Reactions Section -->
+                <div class="comment-reactions">
+                    {% if comment.like > 0 %}
+                    <span class="reaction">
+                        👍 <span id="like-count">{{ comment.like }}</span>
+                    </span>
+                    {% endif %}
+
+                    {% if comment.love > 0 %}
+                    <span class="reaction">
+                        ❤️ <span id="love-count">{{ comment.love }}</span>
+                    </span>
+                    {% endif %}
+
+                    {% if comment.fire > 0 %}
+                    <span class="reaction">
+                        🔥 <span id="fire-count">{{ comment.fire }}</span>
+                    </span>
+                    {% endif %}
+
+                    {% if comment.vauv > 0 %}
+                    <span class="reaction">
+                        😍 <span id="vauv-count">{{ comment.vauv }}</span>
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <footer>
+        <div class="footer-text" onclick="redirectToForm()">Max Up Info</div>
+    </footer>
+
+    <script>
+        function startCountdown(endTime) {
+            function updateTimer() {
+                let now = new Date().getTime();
+                let distance = endTime - now;
+
+                if (distance <= 0) {
+                    document.getElementById("hours").innerHTML = "00";
+                    document.getElementById("minutes").innerHTML = "00";
+                    document.getElementById("seconds").innerHTML = "00";
+                    clearInterval(interval);
+                    return;
+                }
+
+                let hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+                let minutes = Math.floor((distance / (1000 * 60)) % 60);
+                let seconds = Math.floor((distance / 1000) % 60);
+
+                document.getElementById("hours").innerHTML = ("0" + hours).slice(-2);
+                document.getElementById("minutes").innerHTML = ("0" + minutes).slice(-2);
+                document.getElementById("seconds").innerHTML = ("0" + seconds).slice(-2);
+            }
+
+            let interval = setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+
+        let chestOpened = false;
+
+        function toggleChest(clickedChest) {
+            if (chestOpened) return; // Agar sandiq allaqachon ochilgan bo'lsa, qaytib ketamiz
+            chestOpened = true;
+
+            let allChests = document.querySelectorAll(".chest_box");
+            let percentages = [35, 50];
+            let selectedPercentage = 70;
+
+            percentages = percentages.sort(() => Math.random() - 0.5);
+
+            let img = clickedChest.querySelector(".chest_image");
+            let chestText = clickedChest.querySelector(".chest_text");
+            img.src = "{% static 'images/chest_open.png' %}";
+            chestText.innerText = "70%";
+
+            setTimeout(() => {
+                allChests.forEach((chest) => {
+                    if (chest !== clickedChest) {
+                        let img = chest.querySelector(".chest_image");
+                        let chestText = chest.querySelector(".chest_text");
+                        chestText.removeAttribute("hidden")
+                        img.src = "{% static 'images/chest_open.png' %}";
+                        chestText.innerText = percentages.pop() + "%";
+                    } else {
+                        chestText.removeAttribute("hidden")
+                    }
+                });
+            }, 500);
+
+            startConfetti()
+            setTimeout(() => {
+                document.getElementById("discountModal").style.display = "flex";
+            }, 1000);
+
+
+        }
+
+        let confettiInterval;
+
+        function startConfetti() {
+            confettiInterval = setInterval(createConfetti, 50);
+        }
+
+        function stopConfetti() {
+            clearInterval(confettiInterval);
+        }
+
+        function redirectToDiscount() {
+            let endTime = new Date().getTime() + 10 * 60 * 1000; // Hozirdan boshlab 10 minut
+            startCountdown(endTime);
+
+            document.getElementById("discountModal").style.display = "none";
+
+            document.getElementById("discountSection").scrollIntoView({
+                behavior: "smooth"
+            });
+            document.getElementById("chest-div").hidden = true;
+
+            setTimeout(() => {
+                stopConfetti()
+
+            }, 1000);
+        }
+
+        function redirectToForm() {
+            let endTime = new Date().getTime() + 10 * 60 * 1000; // Hozirdan boshlab 10 minut
+            startCountdown(endTime);
+
+            document.getElementById("discountSection").scrollIntoView({
+                behavior: "smooth"
+            });
+        }
+
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#id_region').select2(
+                {
+                    width: "100%",  // Select2 ni keng qilish
+                    theme: "classic",
+                }
+            );
+        });
+    </script>
+
+    <script>
+        function tadaaEffect(element) {
+            element.classList.add("tadaa");
+            setTimeout(() => {
+                element.classList.remove("tadaa");
+            }, 600); // Animatsiya tugagandan keyin klassni olib tashlaymiz
+        }
+    </script>
+
+    <script>
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+
+            // Tasodifiy ranglar
+            const colors = ['#ff5733', '#33ff57', '#3357ff', '#f3ff33', '#ff33a8'];
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+            // X-ranglarni tashkil etish
+            const size = Math.random() * 10 + 5;
+            confetti.style.width = `${size}px`;
+            confetti.style.height = `${size}px`;
+
+            // X va Y yo'nalishida random boshlanish joyi
+            confetti.style.left = `${Math.random() * 100}vw`;
+            confetti.style.top = `-${Math.random() * 50}px`;
+
+            // Sahifaga qo‘shish
+            document.body.appendChild(confetti);
+
+            // Animatsiya tugagach, lentani olib tashlash
+            confetti.addEventListener('animationend', () => {
+                confetti.remove();
+            });
+        }
+
+    </script>
+
+
+</body>
+
+</html>
