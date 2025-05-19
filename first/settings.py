@@ -5,7 +5,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = "4sqj5vZRKK-0DRKRj3q7sPEH9t-a2SXh4cPhUQXlu3-lqrj-07MNOmEd_onXj0BFUaQ"
 DEBUG = False
 
-ALLOWED_HOSTS = ["maxuppppp-production.up.railway.app", "127.0.0.1", "maxup.uz", "www.maxup.uz", "localhost", "185.191.141.79"]
+ALLOWED_HOSTS = ["127.0.0.1", "maxup1.uz", "www.maxup1.uz", "localhost", "185.191.141.79"]
 
 
 INSTALLED_APPS = [
@@ -19,10 +19,10 @@ INSTALLED_APPS = [
     "django_select2",
 ]
 
-CSRF_TRUSTED_ORIGINS = ["https://maxuppppp-production.up.railway.app"]
+CSRF_TRUSTED_ORIGINS = ["https://maxup1.uz"]
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_DOMAIN = ".up.railway.app"  # Railway uchun umumiy domain
+CSRF_COOKIE_DOMAIN = ".uz"  # Railway uchun umumiy domain
 
 
 MIDDLEWARE = [
